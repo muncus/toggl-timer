@@ -18,6 +18,13 @@ parser.add_option("-m", "--tagmap", dest='mapfile',
 # dictionary of tag number -> string
 TAG_MAP = yaml.load(options.mapfile)
 
+def updateToggl(task_name, duration):
+    """update the supplied task on toggl.com.
+    """
+    req = urllib2.Request("http://www.toggl.com/api/v3/tasks/5344561.json")
+    # crud. the post url changes, depending on the task. cant just say "start
+    # this" or "start that"
+
 while True:
     s = stdin.readline()
     if not s:
