@@ -1,0 +1,20 @@
+Time Tracking
+=============
+
+Goal
+----
+create a simple physical interface that lets me record how much time i
+spend doing various things.
+additional analysis on these things can be done later.
+
+Architecture
+------------
+
+* pedestal - The pedestal contains an RFID reader. It reads periodically, to
+    determine if a tag is present. if the tag is new, it records the current
+    time. when the tag is removed, the pedestal prints the tag number, and the
+    number of seconds the tag was present.
+
+* toggl.py script - Reads input from the pedestal, maps the tag name to a task
+    (as configured within the toggl script) and sends the task update to the
+    toggl.com site.
