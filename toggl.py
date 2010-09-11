@@ -57,7 +57,7 @@ def updateTask(taskid, duration):
     print r.get_data()
     print r.get_full_url()
     f = urllib2.urlopen(r)
-    print f
+    print f.read()
 
 
 def addAuthHeader(request, apikey):
