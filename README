@@ -18,3 +18,11 @@ Architecture
 * toggl.py script - Reads input from the pedestal, maps the tag name to a task
     (as configured within the toggl script) and sends the task update to the
     toggl.com site.
+
+
+Misc.
+-----
+
+* idea - use the tags field to include the rfid tag number. that way there's no non-toggl store of this data.
+    * allows us to just 'fetch tasks' in the start, build our own data structure for this.
+    * could cause problems for tasks updated outside of this method. (could refresh task list before updating)
