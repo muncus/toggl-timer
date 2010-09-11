@@ -11,6 +11,17 @@ import urllib2
 import yaml
 import json
 
+class MethodRequest(urllib2.Request):
+    ''' Used to create HEAD/PUT/DELETE/... requests with urllib2 '''
+    def __init__(self, url, data=None, headers={}, method="GET"):
+        urllib2.Request.__init__(self, url, data, headers)
+        self.set_method(method)
+    def set_method(self, method):
+        self.method = method.upper()
+    def get_method(self):
+        return getattr(self, 'method', urllib2.Request.get_method(self))
+
+
 #TODO: remove the need for a yaml map of rfid->task
 #TODO: turn the yaml map into a json map, so i dont need both formats.
 
@@ -40,10 +51,11 @@ def updateTask(taskid, duration):
 
     # now send up the new task.
     posturl = "http://www.toggl.com/api/v3/tasks/%d.json" % task['id']
-    r = urllib2.Request(posturl, data="{\"task\": %s }" % str(task))
+    r = MethodRequest(posturl, data="{\"task\": %s }" % json.dumps(task), method="PUT")
     r = addAuthHeader(r, options.apikey)
     r.add_header("Content-type", "application/json")
-    r.method = 'PUT'
+    print r.get_data()
+    print r.get_full_url()
     f = urllib2.urlopen(r)
     print f
 
