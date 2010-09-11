@@ -25,6 +25,29 @@ TAG_MAP = yaml.load(file(options.mapfile))
 TASKS = []
 print TAG_MAP
 
+def updateTask(taskid, duration):
+    """ add duration to the duration of the task with the supplied id.
+    """
+    TASKS = getTasks() # refresh our task list.
+    print TASKS
+    task = None
+    taskid = taskid
+    for t in TASKS:
+        if t['id'] == taskid:
+            task = t
+            break
+    task['duration'] += int(duration)
+
+    # now send up the new task.
+    posturl = "http://www.toggl.com/api/v3/tasks/%d.json" % task['id']
+    r = urllib2.Request(posturl, data="{\"task\": %s }" % str(task))
+    r = addAuthHeader(r, options.apikey)
+    r.add_header("Content-type", "application/json")
+    r.method = 'PUT'
+    f = urllib2.urlopen(r)
+    print f
+
+
 def addAuthHeader(request, apikey):
     """ This is needed because the toggl servers dont do standard http basic auth.
     """
@@ -38,7 +61,8 @@ def getTasks():
 
     f = urllib2.urlopen(r)
     TASKS = (json.load(f))['data']
-    print TASKS
+    return TASKS
+    #print TASKS
 
 def updateToggl(task_name, duration):
     """update the supplied task on toggl.com.
@@ -48,13 +72,14 @@ def updateToggl(task_name, duration):
     # when we get input, fetch the task associated with the tag, increment the duration, and post it.
 
 getTasks()
-#while True:
-#    s = stdin.readline()
-#    if not s:
-#        break
-#    (key, duration) = s.split() 
-#    print "key: %s" % key
-#    if(TAG_MAP.has_key(key)):
-#        print TAG_MAP[key]
-#    else:
-#        print "unknown tag: %s" % key
+while True:
+    s = stdin.readline()
+    if not s:
+        break
+    (key, duration) = s.split() 
+    print "key: %s" % key
+    if(TAG_MAP.has_key(key)):
+        print TAG_MAP[key]
+        updateTask(TAG_MAP[key], duration)
+    else:
+        print "unknown tag: %s" % key
