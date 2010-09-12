@@ -5,3 +5,11 @@
  * continues to be present, output nothing. when the card is removed, print the
  * ID, and the number of seconds it has been there, followed by a newline.
  */
+ 
+ void setup(){
+   Serial.begin(9600);
+   Serial.println("starting up");
+ }
+ 
+ void loop(){
+ }
