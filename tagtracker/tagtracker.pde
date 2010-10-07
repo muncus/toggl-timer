@@ -29,9 +29,9 @@ void loop(){
   if(rfid.available() > 0){
     //we have some data. read it.
     readID12(temptag);
-
+    // print it.
     for (int i=0; i<5; i++){
-      if (temptag[i] < 16) Serial.print("0");
+      //if (temptag[i] < 16) Serial.print("0");
       Serial.print(temptag[i], HEX);
     }
   }
