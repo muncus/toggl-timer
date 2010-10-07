@@ -1,0 +1,10 @@
+Tag Tracker
+===========
+
+This is the arduino code for reading rfid tags, and keeping track of how long
+the tag is left on the reader.
+
+To use this, you'll need the AFSoftSerial library, available from:
+http://www.ladyada.net/make/eshield/AFSoftSerial.zip
+
+TODO: make it use NewSoftSerial: http://arduiniana.org/libraries/NewSoftSerial/
