@@ -1,4 +1,4 @@
-#include <AFSoftSerial.h>
+#include <NewSoftSerial.h>
 
 /*
  * Tag Tracker
@@ -15,7 +15,7 @@
 #define PIN_RFID_TX 8 // not used.
 #define PIN_RFID_RX 9
 
-AFSoftSerial rfid = AFSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
+NewSoftSerial rfid = NewSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
 byte temptag[10];
 
 void setup(){
