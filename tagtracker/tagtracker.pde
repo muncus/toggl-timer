@@ -21,15 +21,15 @@ byte temptag[10];
 void setup(){
   Serial.begin(9600);
   Serial.println("starting up");
+  Serial.println("yes, from begin()");
   
   
-
   rfid.begin(9600);
 }
 
 void loop(){
   //Serial.println("waiting for data");
-  //if(rfid.available() > 0){
+  if(rfid.available() > 0){
     //we have some data. read it.
     Serial.println("reading data");
     readID12(temptag);
@@ -39,7 +39,8 @@ void loop(){
       //if (temptag[i] < 16) Serial.print("0");
       Serial.print(temptag[i], HEX);
     }
-  //}
+  
+}
   Serial.println("waiting");
   delay(200);
 
@@ -68,8 +69,7 @@ boolean readID12(byte *code)
     //Serial.println("about to read a byte..");
     
     
-    if( rfid.available() > 0) 
-    //if( 1)
+    if( rfid.available() > 0)
     { 
       Serial.println("reading a byte..");
       val = rfid.read();
