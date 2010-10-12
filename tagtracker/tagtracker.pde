@@ -17,8 +17,13 @@
 
 NewSoftSerial rfid = NewSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
 byte temptag[10];
+byte currentTag[10];           // the tag we are currently tracking.
+unsigned int tagStartTime = 0; // time at which we first saw currentTag
 
 void setup(){
+  pinMode(PIN_RESET, OUTPUT); // set our reset pin up for resetting.
+  digitalWrite(PIN_RESET, HIGH);
+  
   Serial.begin(9600);
   Serial.println("starting up");
   
@@ -39,7 +44,7 @@ void loop(){
     }
   
   }
-  delay(200);
+  //delay(200);
 
 }
 
@@ -134,4 +139,10 @@ boolean readID12(byte *code)
   return result;
 }
 
+void resetRfid(){
+  //durp.
+  digitalWrite(PIN_RESET, LOW);
+  delay(1000);
+  digitalWrite(PIN_RESET, HIGH);
+}
 
