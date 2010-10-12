@@ -74,16 +74,23 @@ boolean readID12(byte *code)
       //Serial.print("read: ");
       //
       //Serial.println(val, BYTE);
+      // 0x0D == CR
+      // 0x0A == LF
+      // 0x03 == ETX
       
       if(val == 0x02){
-        Serial.println("found STX");
-      } else if (val == 0x03){
-        Serial.println("found ETX");
+        //Serial.println("found STX");
+        bytesIn++;
+        continue; //skip to the next byte.
+      } else if (val == 0x0D){
+        rfid.read(); // on to the lf
+        rfid.read(); // on to the etx.
+        //Serial.println("found ETX");
       }
       
       
       // if CR, LF, ETX or STX before the 10 digit reading -> stop reading
-      if((val == 0x0D)||(val == 0x0A)||(val == 0x03)||(val == 0x02)) break;
+      //if((val == 0x0D)||(val == 0x0A)||(val == 0x03)||(val == 0x02)) break;
 
       // Do Ascii/Hex conversion:
       if ((val >= '0') && (val <= '9')) 
