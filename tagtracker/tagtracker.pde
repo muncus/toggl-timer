@@ -21,27 +21,24 @@ byte temptag[10];
 void setup(){
   Serial.begin(9600);
   Serial.println("starting up");
-  Serial.println("yes, from begin()");
-  
   
   rfid.begin(9600);
 }
 
 void loop(){
-  //Serial.println("waiting for data");
+
   if(rfid.available() > 0){
     //we have some data. read it.
-    Serial.println("reading data");
+    //Serial.println("reading data");
     readID12(temptag);
     // print it.
-    Serial.println("printing data");
+    //Serial.println("printing data");
     for (int i=0; i<5; i++){
       //if (temptag[i] < 16) Serial.print("0");
       Serial.print(temptag[i], HEX);
     }
   
-}
-  Serial.println("waiting");
+  }
   delay(200);
 
 }
@@ -56,7 +53,7 @@ void loop(){
 boolean readID12(byte *code)
 
 {
-  Serial.println("reading from id12");
+  //Serial.println("reading from id12");
   boolean result = false;
   byte val = 0;
   byte bytesIn = 0;
@@ -71,14 +68,20 @@ boolean readID12(byte *code)
     
     if( rfid.available() > 0)
     { 
-      Serial.println("reading a byte..");
+      //Serial.println("reading a byte..");
       val = rfid.read();
       
-      Serial.print("read: ");
-      Serial.println(val, BYTE)
+      //Serial.print("read: ");
+      //
+      //Serial.println(val, BYTE);
       
-      ;
-
+      if(val == 0x02){
+        Serial.println("found STX");
+      } else if (val == 0x03){
+        Serial.println("found ETX");
+      }
+      
+      
       // if CR, LF, ETX or STX before the 10 digit reading -> stop reading
       if((val == 0x0D)||(val == 0x0A)||(val == 0x03)||(val == 0x02)) break;
 
