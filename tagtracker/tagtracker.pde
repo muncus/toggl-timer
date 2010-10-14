@@ -16,8 +16,8 @@
 #define PIN_RFID_RX 9
 
 NewSoftSerial rfid = NewSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
-byte temptag[10];
-byte currentTag[10];           // the tag we are currently tracking.
+char temptag[RFID_TAG_LENGTH];
+char currentTag[RFID_TAG_LENGTH];           // the tag we are currently tracking.
 unsigned int tagStartTime = 0; // time at which we first saw currentTag
 
 void setup(){
@@ -35,12 +35,12 @@ void loop(){
   if(rfid.available() > 0){
     //we have some data. read it.
     //Serial.println("reading data");
-    readID12(temptag);
+    readRaw(temptag);
     // print it.
     //Serial.println("printing data");
-    for (int i=0; i<5; i++){
+    for (int i=0; i<RFID_TAG_LENGTH; i++){
       //if (temptag[i] < 16) Serial.print("0");
-      Serial.print(temptag[i], HEX);
+      Serial.print(temptag[i]);
     }
   
   }
@@ -55,8 +55,7 @@ void loop(){
  * Based on code by BARRAGAN, HC Gilje, djmatic, Martijn
  * http://www.arduino.cc/playground/Code/ID12 
  */
-boolean readID12(byte *code)
-
+boolean readID12(char *code)
 {
   //Serial.println("reading from id12");
   boolean result = false;
@@ -144,5 +143,77 @@ void resetRfid(){
   digitalWrite(PIN_RESET, LOW);
   delay(1000);
   digitalWrite(PIN_RESET, HIGH);
+}
+
+//just grab the bytes, and return them.
+boolean readRaw(char *code)
+{
+  //Serial.println("reading from id12");
+  boolean result = false;
+  char val = 0;
+  byte bytesIn = 0;
+  byte tempbyte = 0;
+  byte checksum = 0;
+
+  // read 10 digit code + 2 digit checksum
+    
+    if( rfid.available() > 0)
+    { 
+      //Serial.println("reading a byte..");
+      val = rfid.read();
+      
+      //Serial.println(val, BYTE);
+      // 0x0D == CR
+      // 0x0A == LF
+      // 0x03 == ETX
+      
+      if(val == 0x02){
+        Serial.println("found STX");
+      } else {
+        Serial.println("broken data! oh noes!");
+      }
+      
+      for(int i=0;i<RFID_TAG_LENGTH;i++){
+        code[i] = rfid.read();
+        Serial.print("read: ");
+        Serial.println(code[i]);
+        checksum ^= code[i];
+      }
+      
+      //chomp the end off.
+      //checksum
+      tempbyte = rfid.read();
+      if(tempbyte == checksum){
+        Serial.println("checksum matched");
+      } else {
+        Serial.print("checksum: ");
+        Serial.print(tempbyte, HEX);
+        Serial.print(" vs ");
+        Serial.println(checksum, HEX);
+      }
+      //cr/lf
+      rfid.read();
+      rfid.read();
+      //etx
+      rfid.read();
+      return true;
+
+
+      bytesIn++;                                
+    } 
+ 
+
+  // read complete
+  if (bytesIn == RFID_TAG_INPUT) 
+  { 
+    // valid tag
+    if(code[5] == checksum) result = true; 
+  }
+
+  // reset id-12
+  //updateID12(true);
+
+
+  return result;
 }
 
