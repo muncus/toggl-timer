@@ -182,6 +182,7 @@ boolean readRaw(char *code)
       
       //chomp the end off.
       //checksum
+      //TODO: make checksumming actually work.
       tempbyte = rfid.read();
       if(tempbyte == checksum){
         Serial.println("checksum matched");
@@ -191,6 +192,9 @@ boolean readRaw(char *code)
         Serial.print(" vs ");
         Serial.println(checksum, HEX);
       }
+      //TODO: put some assertions in here for error checking.
+      //theres a second byte of checksum. 
+      rfid.read();
       //cr/lf
       rfid.read();
       rfid.read();
