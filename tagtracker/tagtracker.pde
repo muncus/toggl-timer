@@ -175,8 +175,8 @@ boolean readRaw(char *code)
       
       for(int i=0;i<RFID_TAG_LENGTH;i++){
         code[i] = rfid.read();
-        Serial.print("read: ");
-        Serial.println(code[i]);
+        //Serial.print("read: ");
+        //Serial.println(code[i]);
         checksum ^= code[i];
       }
       
