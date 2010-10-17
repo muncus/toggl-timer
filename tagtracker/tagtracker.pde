@@ -9,7 +9,7 @@
  */
  
 #define RFID_TAG_LENGTH 10  //bytes needed to read the tag id.
-#define RFID_TAG_INPUT  10  //bytes of input required to read a whole tag.
+#define RFID_TAG_INPUT  16  //bytes of input required to read a whole tag.
 
 #define PIN_RESET 7
 #define PIN_RFID_TX 8 // not used.
@@ -42,6 +42,9 @@ void loop(){
       //if (temptag[i] < 16) Serial.print("0");
       Serial.print(temptag[i]);
     }
+    Serial.println("");
+    strncpy(currentTag, temptag, 10);
+    resetRfid();
   
   }
   //delay(200);
@@ -70,8 +73,7 @@ boolean readID12(char *code)
     //Serial.println("about to read a byte..");
     
     
-    if( rfid.available() > 0)
-    { 
+    if( rfid.available() >= RFID_TAG_INPUT) { 
       //Serial.println("reading a byte..");
       val = rfid.read();
       
@@ -85,12 +87,13 @@ boolean readID12(char *code)
       if(val == 0x02){
         //Serial.println("found STX");
         bytesIn++;
-        continue; //skip to the next byte.
-      } else if (val == 0x0D){
-        rfid.read(); // on to the lf
-        rfid.read(); // on to the etx.
+        //continue; //skip to the next byte.
+      } 
+      //else if (val == 0x0D){
+        //rfid.read(); // on to the lf
+        //rfid.read(); // on to the etx.
         //Serial.println("found ETX");
-      }
+      //}
       
       
       // if CR, LF, ETX or STX before the 10 digit reading -> stop reading
@@ -151,7 +154,6 @@ boolean readRaw(char *code)
   //Serial.println("reading from id12");
   boolean result = false;
   char val = 0;
-  byte bytesIn = 0;
   byte tempbyte = 0;
   byte checksum = 0;
 
@@ -159,7 +161,7 @@ boolean readRaw(char *code)
     
     if( rfid.available() > 0)
     { 
-      //Serial.println("reading a byte..");
+
       val = rfid.read();
       
       //Serial.println(val, BYTE);
@@ -170,7 +172,8 @@ boolean readRaw(char *code)
       if(val == 0x02){
         Serial.println("found STX");
       } else {
-        Serial.println("broken data! oh noes!");
+        Serial.println("invalid read.");
+        return false;
       }
       
       for(int i=0;i<RFID_TAG_LENGTH;i++){
@@ -194,7 +197,7 @@ boolean readRaw(char *code)
       }
       //TODO: put some assertions in here for error checking.
       //theres a second byte of checksum. 
-      rfid.read();
+      //rfid.read();
       //cr/lf
       rfid.read();
       rfid.read();
@@ -202,17 +205,17 @@ boolean readRaw(char *code)
       rfid.read();
       return true;
 
-
-      bytesIn++;                                
     } 
  
 
   // read complete
+  /*
   if (bytesIn == RFID_TAG_INPUT) 
   { 
     // valid tag
     if(code[5] == checksum) result = true; 
   }
+  */
 
   // reset id-12
   //updateID12(true);
