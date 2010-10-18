@@ -19,6 +19,7 @@ NewSoftSerial rfid = NewSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
 char temptag[RFID_TAG_LENGTH];
 char currentTag[RFID_TAG_LENGTH];           // the tag we are currently tracking.
 unsigned int tagStartTime = 0; // time at which we first saw currentTag
+boolean tagPresent = false;
 
 void setup(){
   pinMode(PIN_RESET, OUTPUT); // set our reset pin up for resetting.
@@ -32,35 +33,44 @@ void setup(){
 }
 
 void loop(){
-
-  if(rfid.available() > 0){
-    //we have some data. read it.
-    //Serial.println("reading data");
-    readRaw(temptag);
-    
-    if(tagStartTime == 0){
-      //we dont have a tag, record it.
-      strncpy(currentTag, temptag, 10);
-      tagStartTime = millis();
-      //Serial.println("got a new tag");
-    }
-    else if (tagsEqual(temptag, currentTag) != 0){
-      //tags not equal, print our tag
-      break;
-    }
-    // print it.
-    //Serial.println("printing data");
-    for (int i=0; i<RFID_TAG_LENGTH; i++){
-      //if (temptag[i] < 16) Serial.print("0");
-      Serial.print(temptag[i]);
-    }
-    Serial.println("");
-    //new tag. grab it, and check the time.
+  //Serial.println("reading data");
+  tagPresent = readRaw(temptag);
+  
+  if(tagPresent && tagStartTime == 0){
+    //we dont have a tag, record it.
     strncpy(currentTag, temptag, 10);
     tagStartTime = millis();
-    resetRfid();
-
+    Serial.println("got a new tag");
   }
+  else if ( !tagPresent && tagStartTime != 0){
+    //we were tracking a tag, and its gone.
+    Serial.println("had a tag, its gone missing");
+    Serial.print(currentTag);
+    Serial.print(" ");
+    Serial.println((millis() - tagStartTime)/1000); //seconds since tag seen.
+  }
+  //else if (tagsEqual(temptag, currentTag) != 0){
+  //  //tags not equal, print our tag
+  //  Serial.println("durp");
+  //}
+  else {
+    Serial.println("um, i'm not sure what to do.");
+  }
+  /*
+  // print it.
+  //Serial.println("printing data");
+  for (int i=0; i<RFID_TAG_LENGTH; i++){
+    //if (temptag[i] < 16) Serial.print("0");
+    Serial.print(temptag[i]);
+  }
+  Serial.println("");
+  //new tag. grab it, and check the time.
+  strncpy(currentTag, temptag, 10);
+  tagStartTime = millis();
+  */
+  resetRfid();
+
+
   //delay(200);
 
 }
