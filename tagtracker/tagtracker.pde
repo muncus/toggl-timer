@@ -17,13 +17,16 @@
 
 NewSoftSerial rfid = NewSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
 char temptag[RFID_TAG_LENGTH];
-char currentTag[RFID_TAG_LENGTH];           // the tag we are currently tracking.
+char currentTag[RFID_TAG_LENGTH+1];           // the tag we are currently tracking.
 unsigned int tagStartTime = 0; // time at which we first saw currentTag
 boolean tagPresent = false;
 
 void setup(){
   pinMode(PIN_RESET, OUTPUT); // set our reset pin up for resetting.
   digitalWrite(PIN_RESET, HIGH);
+  
+  memset(currentTag, 0, 11);
+  memset(temptag, 0, 10);
 
   Serial.begin(9600);
   Serial.println("starting up");
@@ -48,14 +51,17 @@ void loop(){
     Serial.print(currentTag);
     Serial.print(" ");
     Serial.println((millis() - tagStartTime)/1000); //seconds since tag seen.
+    memset(currentTag, 0, 11);
+    tagStartTime = 0;
   }
   //else if (tagsEqual(temptag, currentTag) != 0){
   //  //tags not equal, print our tag
   //  Serial.println("durp");
   //}
-  else {
-    Serial.println("um, i'm not sure what to do.");
-  }
+  //else {
+    //Serial.println("um, i'm not sure what to do.");
+  //  return;
+  //}
   /*
   // print it.
   //Serial.println("printing data");
@@ -69,9 +75,7 @@ void loop(){
   tagStartTime = millis();
   */
   resetRfid();
-
-
-  //delay(200);
+  delay(200);
 
 }
 
