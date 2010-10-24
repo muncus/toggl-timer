@@ -86,8 +86,8 @@ def updateToggl(task_name, duration):
 getTasks()
 while True:
     s = stdin.readline()
-    if not s:
-        break
+    if not s or s[0] == '#':
+        continue
     (key, duration) = s.split() 
     print "key: %s" % key
     if(TAG_MAP.has_key(key)):
