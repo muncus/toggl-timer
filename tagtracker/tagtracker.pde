@@ -7,6 +7,8 @@
  */
 #include <NewSoftSerial.h>
 
+#define DEBUG 0
+
 #define RFID_TAG_LENGTH 10  //bytes needed to read the tag id.
 #define RFID_TAG_INPUT  16  //bytes of input required to read a whole tag.
 
@@ -103,8 +105,10 @@ boolean readRaw(char *code)
       code[i] = rfid.read();
       i_val = ctoi(code[i]);
       
-      Serial.print("# read: ");
-      Serial.println(code[i], HEX);
+      if(DEBUG){
+        Serial.print("# read: ");
+        Serial.println(code[i], HEX);
+      }
       if(i<5){
         ci = 0;
       } 
