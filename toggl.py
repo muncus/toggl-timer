@@ -91,17 +91,17 @@ def getTask(cpn, duration):
       "duration": %(duration)s,
       "billable": true,
       "start": "%(timestamp)s",
-      "client_project_name": "%(cpn)s",
-      "created_with": "%(useragent)s",
-      "tag_names": %(tagarray)s
+      "project" : {
+      "client_project_name": "%(cpn)s"
+      },
+      "created_with": "%(useragent)s"
     }}"""
     #TODO: implement timezone
     return task_template % {
         'duration': duration,
         'cpn' : cpn,
         'useragent': "toggl.py",
-        'timestamp': datetime.datetime.now().isoformat(),
-        'tagarray': "[\"tt\"]"
+        'timestamp': datetime.datetime.utcnow().isoformat(),
     }
 
 if __name__ == "__main__":
