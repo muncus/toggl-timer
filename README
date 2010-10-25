@@ -10,19 +10,20 @@ additional analysis on these things can be done later.
 Architecture
 ------------
 
-* pedestal - The pedestal contains an RFID reader. It reads periodically, to
+* reader - The reader assembly contains an RFID reader. It reads periodically, to
     determine if a tag is present. if the tag is new, it records the current
     time. when the tag is removed, the pedestal prints the tag number, and the
     number of seconds the tag was present.
 
 * toggl.py script - Reads input from the pedestal, maps the tag name to a task
-    (as configured within the toggl script) and sends the task update to the
-    toggl.com site.
+    (as configured within the tags.yaml file) and creates a new task via
+    toggl.com's API.
 
-
-Misc.
+Usage
 -----
 
-* idea - use the tags field to include the rfid tag number. that way there's no non-toggl store of this data.
-    * allows us to just 'fetch tasks' in the start, build our own data structure for this.
-    * could cause problems for tasks updated outside of this method. (could refresh task list before updating)
+* plug in the RFID reader assembly, determine which usbserial device it is.
+* use stty to configure the serial port for raw reads:
+    `stty -F /dev/ttyUSB0 raw`
+* direct the reader's output to the toggl.py script:
+    `cat /dev/ttyUSB0 | python toggl.py -m tags.yaml -k <your api key>`
