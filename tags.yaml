@@ -1,2 +1,3 @@
 # map rfid tag numbers to toggl tasks.
-"0" : 5344645 #my 'first post' task.
+"0" : "Testing"
+"1" : "Art - time tracking"

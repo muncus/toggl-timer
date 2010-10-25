@@ -10,6 +10,7 @@ import base64
 import urllib2
 import yaml
 import json
+import datetime
 
 class MethodRequest(urllib2.Request):
     ''' Used to create HEAD/PUT/DELETE/... requests with urllib2 '''
@@ -25,14 +26,9 @@ class MethodRequest(urllib2.Request):
 #TODO: remove the need for a yaml map of rfid->task
 #TODO: turn the yaml map into a json map, so i dont need both formats.
 
-parser = OptionParser()
-parser.add_option("-k", "--toggl_key", dest='apikey', help="Toggl api key")
-parser.add_option("-m", "--tagmap", dest='mapfile',
-                  help="yaml file containing tag id -> task mapping")
-(options, args) = parser.parse_args()
 
 # dictionary of tag number -> string
-TAG_MAP = yaml.load(file(options.mapfile))
+TAG_MAP = {}
 TASKS = []
 print TAG_MAP
 
@@ -59,6 +55,17 @@ def updateTask(taskid, duration):
     f = urllib2.urlopen(r)
     print f.read()
 
+def createTask(taskstr):
+    """ creates a new task in Toggl with the specified contents."""
+    # now send up the new task.
+    posturl = "http://www.toggl.com/api/v3/tasks.json"
+    r = MethodRequest(posturl, data=taskstr, method="POST")
+    r = addAuthHeader(r, options.apikey)
+    r.add_header("Content-type", "application/json")
+    print r.get_data()
+    print r.get_full_url()
+    f = urllib2.urlopen(r)
+    print f.read()
 
 def addAuthHeader(request, apikey):
     """ This is needed because the toggl servers dont do standard http basic auth.
@@ -73,25 +80,48 @@ def getTasks():
 
     f = urllib2.urlopen(r)
     TASKS = (json.load(f))['data']
-    return TASKS
     #print TASKS
+    return TASKS
 
-def updateToggl(task_name, duration):
-    """update the supplied task on toggl.com.
-    """
-    pass
-    # map needs to map to a task id.
-    # when we get input, fetch the task associated with the tag, increment the duration, and post it.
+def getTask(cpn, duration):
+    """creates a new toggl task, with the specified client_project_name."""
+    #TODO: consider implementing this with JSONObject instead
+    task_template = """{
+    "task" : {
+      "duration": %(duration)s,
+      "billable": true,
+      "start": "%(timestamp)s",
+      "client_project_name": "%(cpn)s",
+      "created_with": "%(useragent)s",
+      "tag_names": %(tagarray)s
+    }}"""
+    #TODO: implement timezone
+    return task_template % {
+        'duration': duration,
+        'cpn' : cpn,
+        'useragent': "toggl.py",
+        'timestamp': datetime.datetime.now().isoformat(),
+        'tagarray': "[\"tt\"]"
+    }
 
-getTasks()
-while True:
-    s = stdin.readline()
-    if not s or s[0] == '#':
-        continue
-    (key, duration) = s.split() 
-    print "key: %s" % key
-    if(TAG_MAP.has_key(key)):
-        print TAG_MAP[key]
-        updateTask(TAG_MAP[key], duration)
-    else:
-        print "unknown tag: %s" % key
+if __name__ == "__main__":
+    parser = OptionParser()
+    parser.add_option("-k", "--toggl_key", dest='apikey', help="Toggl api key")
+    parser.add_option("-m", "--tagmap", dest='mapfile',
+                      help="yaml file containing tag id -> task mapping")
+    (options, args) = parser.parse_args()
+    TAG_MAP = yaml.load(file(options.mapfile))
+
+    getTasks()
+    while True:
+        s = stdin.readline()
+        if not s or s[0] == '#':
+            continue
+        (key, duration) = s.split() 
+        print "key: %s" % key
+        if(TAG_MAP.has_key(key)):
+            print TAG_MAP[key]
+            #updateTask(TAG_MAP[key], duration)
+            createTask(getTask(TAG_MAP[key], duration))
+        else:
+            print "unknown tag: %s" % key
