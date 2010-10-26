@@ -19,7 +19,7 @@
 NewSoftSerial rfid = NewSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
 char temptag[RFID_TAG_LENGTH];
 char currentTag[RFID_TAG_LENGTH+1]; // the tag we are currently tracking.
-unsigned int tagStartTime = 0;      // time at which we first saw currentTag
+unsigned long tagStartTime = 0;      // time at which we first saw currentTag
 boolean tagPresent = false;
 
 void setup(){
