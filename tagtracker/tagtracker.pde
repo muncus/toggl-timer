@@ -42,18 +42,23 @@ void loop(){
   
   if(tagPresent && tagStartTime == 0){
     //we dont have a tag, record it.
+    Serial.print("# clocking in: ");
+    Serial.println(temptag);
+
     strncpy(currentTag, temptag, 10);
     tagStartTime = millis();
     Serial.println("# got a new tag");
   }
-  else if ( !tagPresent && tagStartTime != 0){
-    //we were tracking a tag, and its gone.
-    Serial.println("# had a tag, its gone missing");
-    Serial.print(currentTag);
-    Serial.print(" ");
-    Serial.println((millis() - tagStartTime)/1000); //seconds since tag seen.
-    memset(currentTag, 0, 11);
-    tagStartTime = 0;
+  else if ( tagPresent && tagStartTime != 0 ){
+    if(strcmp(temptag, currentTag) == 0){
+        Serial.println("# read current tag again, clocking out.");
+
+        Serial.print(currentTag);
+        Serial.print(" ");
+        Serial.println((millis() - tagStartTime)/1000); //seconds since tag seen.
+        memset(currentTag, 0, 11);
+        tagStartTime = 0;
+    }
   }
 
   resetRfid();
