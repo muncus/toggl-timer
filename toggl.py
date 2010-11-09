@@ -50,11 +50,11 @@ def updateTask(taskid, duration):
     f = urllib2.urlopen(r)
     print f.read()
 
-def createTask(taskstr):
+def createTask(taskobj):
     """ creates a new task in Toggl with the specified contents."""
     # now send up the new task.
     posturl = "http://www.toggl.com/api/v3/tasks.json"
-    r = MethodRequest(posturl, data=taskstr, method="POST")
+    r = MethodRequest(posturl, data=json.dump(taskobj), method="POST")
     r = addAuthHeader(r, options.apikey)
     r.add_header("Content-type", "application/json")
     print r.get_data()
@@ -77,6 +77,18 @@ def getTasks():
     TASKS = (json.load(f))['data']
     #print TASKS
     return TASKS
+
+def getTaskJsonObject(cpn, duration):
+    """Creates a Toggl task api object, using a JsonObject."""
+    baseobj = {
+        'duration': duration,
+        'billable': True,
+        'start': starttime,
+        'end': endtime,
+        'project' : {'client_project_name': cpn},
+        'created_with': useragent,
+    }
+    return {'task': baseobj}
 
 def getTask(cpn, duration):
     """creates a new toggl task, with the specified client_project_name."""
@@ -116,7 +128,6 @@ if __name__ == "__main__":
         print "key: %s" % key
         if(TAG_MAP.has_key(key)):
             print TAG_MAP[key]
-            #updateTask(TAG_MAP[key], duration)
-            createTask(getTask(TAG_MAP[key], duration))
+            createTask(getTaskJsonObject(TAG_MAP[key], duration))
         else:
             print "unknown tag: %s" % key
