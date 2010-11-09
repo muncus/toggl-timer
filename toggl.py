@@ -8,7 +8,6 @@ from optparse import OptionParser
 from sys import stdin
 import base64
 import urllib2
-import yaml
 import json
 import datetime
 
@@ -21,10 +20,6 @@ class MethodRequest(urllib2.Request):
         self.method = method.upper()
     def get_method(self):
         return getattr(self, 'method', urllib2.Request.get_method(self))
-
-
-#TODO: remove the need for a yaml map of rfid->task
-#TODO: turn the yaml map into a json map, so i dont need both formats.
 
 
 # dictionary of tag number -> string
@@ -108,9 +103,9 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-k", "--toggl_key", dest='apikey', help="Toggl api key")
     parser.add_option("-m", "--tagmap", dest='mapfile',
-                      help="yaml file containing tag id -> task mapping")
+                      help="yaml/json file containing tag id -> task mapping")
     (options, args) = parser.parse_args()
-    TAG_MAP = yaml.load(file(options.mapfile))
+    TAG_MAP = json.load(file(options.mapfile))
 
     getTasks()
     while True:
