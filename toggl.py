@@ -30,13 +30,11 @@ class MethodRequest(urllib2.Request):
 # dictionary of tag number -> string
 TAG_MAP = {}
 TASKS = []
-print TAG_MAP
 
 def updateTask(taskid, duration):
     """ add duration to the duration of the task with the supplied id.
     """
     TASKS = getTasks() # refresh our task list.
-    print TASKS
     task = None
     taskid = taskid
     for t in TASKS:
@@ -80,7 +78,6 @@ def getTasks():
 
     f = urllib2.urlopen(r)
     TASKS = (json.load(f))['data']
-    #print TASKS
     return TASKS
 
 def getTask(cpn, duration):
@@ -112,15 +109,13 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
     TAG_MAP = yaml.load(file(options.mapfile))
 
-    getTasks()
     while True:
         s = stdin.readline()
         if not s or s[0] == '#':
             continue
         (key, duration) = s.split() 
-        print "key: %s" % key
+        #print "key: %s" % key
         if(TAG_MAP.has_key(key)):
-            print TAG_MAP[key]
             #updateTask(TAG_MAP[key], duration)
             createTask(getTask(TAG_MAP[key], duration))
         else:
