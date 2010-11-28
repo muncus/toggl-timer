@@ -12,6 +12,8 @@ import yaml
 import json
 import datetime
 
+USERAGENT = "toggl.py/punchclock"
+
 class MethodRequest(urllib2.Request):
     ''' Used to create HEAD/PUT/DELETE/... requests with urllib2 '''
     def __init__(self, url, data=None, headers={}, method="GET"):
@@ -53,11 +55,11 @@ def updateTask(taskid, duration):
     f = urllib2.urlopen(r)
     print f.read()
 
-def createTask(taskstr):
+def createTask(taskobj):
     """ creates a new task in Toggl with the specified contents."""
     # now send up the new task.
     posturl = "http://www.toggl.com/api/v3/tasks.json"
-    r = MethodRequest(posturl, data=taskstr, method="POST")
+    r = MethodRequest(posturl, data=json.dumps(taskobj), method="POST")
     r = addAuthHeader(r, options.apikey)
     r.add_header("Content-type", "application/json")
     print r.get_data()
@@ -79,6 +81,20 @@ def getTasks():
     f = urllib2.urlopen(r)
     TASKS = (json.load(f))['data']
     return TASKS
+
+def getTaskJsonObject(cpn, duration):
+    """Creates a Toggl task api object, using a JsonObject."""
+    starttime = datetime.datetime.utcnow() - datetime.timedelta(seconds=duration)
+    endtime = datetime.datetime.utcnow()
+    baseobj = {
+        'duration': duration,
+        'billable': True,
+        'start': starttime.isoformat(),
+        'end': endtime.isoformat(),
+        'project' : {'client_project_name': cpn},
+        'created_with': USERAGENT,
+    }
+    return {'task': baseobj}
 
 def getTask(cpn, duration):
     """creates a new toggl task, with the specified client_project_name."""
@@ -117,6 +133,6 @@ if __name__ == "__main__":
         #print "key: %s" % key
         if(TAG_MAP.has_key(key)):
             #updateTask(TAG_MAP[key], duration)
-            createTask(getTask(TAG_MAP[key], duration))
+            createTask(getTaskJsonObject(TAG_MAP[key], duration))
         else:
             print "unknown tag: %s" % key
