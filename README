@@ -10,12 +10,11 @@ additional analysis on these things can be done later.
 Architecture
 ------------
 
-* reader - The reader assembly contains an RFID reader. It reads periodically, to
-    determine if a tag is present. if the tag is new, it records the current
-    time. when the tag is removed, the pedestal prints the tag number, and the
-    number of seconds the tag was present.
+* reader - The reader assembly contains an RFID reader. It functions like a
+    punch-clock: tag once to start timing, and again (with the same tag) to stop
+    timing and ouput tag number and the duration.
 
-* toggl.py script - Reads input from the pedestal, maps the tag name to a task
+* toggl.py script - Reads input from the reader, maps the tag name to a task
     (as configured within the tags.yaml file) and creates a new task via
     toggl.com's API.
 
@@ -27,3 +26,5 @@ Usage
     `stty -F /dev/ttyUSB0 raw`
 * direct the reader's output to the toggl.py script:
     `cat /dev/ttyUSB0 | python toggl.py -m tags.yaml -k <your api key>`
+    OR
+    `python toggl.py -i /dev/ttyUSB0 -m tags.yaml -k <your api key>`
