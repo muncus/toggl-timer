@@ -28,3 +28,8 @@ Usage
     `cat /dev/ttyUSB0 | python toggl.py -m tags.yaml -k <your api key>`
     OR
     `python toggl.py -i /dev/ttyUSB0 -m tags.yaml -k <your api key>`
+
+Future Plans
+------------
+* use tags with storage (like the mifare 1Ks) to store client_project_name
+* tests.
