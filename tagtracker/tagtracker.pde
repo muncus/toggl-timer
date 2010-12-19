@@ -7,7 +7,7 @@
  */
 #include <NewSoftSerial.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 #define RFID_TAG_LENGTH 10  //bytes needed to read the tag id.
 #define RFID_TAG_INPUT  16  //bytes of input required to read a whole tag.
@@ -15,6 +15,7 @@
 #define PIN_RESET 7
 #define PIN_RFID_TX 8 // not used.
 #define PIN_RFID_RX 9
+#define PIN_CLOCK_RUNNING 13 //indicates that we are clocked in
 
 NewSoftSerial rfid = NewSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
 char temptag[RFID_TAG_LENGTH];
@@ -25,6 +26,9 @@ boolean tagPresent = false;
 void setup(){
   pinMode(PIN_RESET, OUTPUT); // set our reset pin up for resetting.
   digitalWrite(PIN_RESET, HIGH);
+
+  pinMode(PIN_CLOCK_RUNNING, OUTPUT);
+  digitalWrite(PIN_CLOCK_RUNNING, LOW);
   
   memset(currentTag, 0, 11);
   memset(temptag, 0, 10);
@@ -48,9 +52,10 @@ void loop(){
     strncpy(currentTag, temptag, 10);
     tagStartTime = millis();
     Serial.println("# got a new tag");
+    digitalWrite(PIN_CLOCK_RUNNING, HIGH);
   }
   else if ( tagPresent && tagStartTime != 0 ){
-    if(strcmp(temptag, currentTag) == 0){
+    if(tagsEqual(temptag, currentTag) == 0){
         Serial.println("# read current tag again, clocking out.");
 
         Serial.print(currentTag);
@@ -58,6 +63,10 @@ void loop(){
         Serial.println((millis() - tagStartTime)/1000); //seconds since tag seen.
         memset(currentTag, 0, 11);
         tagStartTime = 0;
+        digitalWrite(PIN_CLOCK_RUNNING, LOW);
+    }
+    else {
+      Serial.println("# tags didnt match. :(");
     }
   }
 

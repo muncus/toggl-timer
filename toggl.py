@@ -60,27 +60,6 @@ def getTaskJsonObject(cpn, duration):
     }
     return {'task': baseobj}
 
-def getTask(cpn, duration):
-    """creates a new toggl task, with the specified client_project_name."""
-    #TODO: consider implementing this with JSONObject instead
-    task_template = """{
-    "task" : {
-      "duration": %(duration)s,
-      "billable": true,
-      "start": "%(timestamp)s",
-      "project" : {
-      "client_project_name": "%(cpn)s"
-      },
-      "created_with": "%(useragent)s"
-    }}"""
-    #TODO: implement timezone
-    return task_template % {
-        'duration': duration,
-        'cpn' : cpn,
-        'useragent': "toggl.py",
-        'timestamp': datetime.datetime.utcnow().isoformat(),
-    }
-
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-k", "--toggl_key", dest='apikey', help="Toggl api key")
