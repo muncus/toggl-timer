@@ -124,7 +124,7 @@ if __name__ == "__main__":
                       help="yaml file containing tag id -> task mapping")
     parser.add_option("-i", "--input", dest='input', default=None,
                       help="read input from the specified file/device")
-    parser.add_option("-m", "--min_time", dest='min_time', default=0,
+    parser.add_option("-m", "--min_time", dest='min_time', default=10,
                       help="events shorter than this will not be reported")
     (options, args) = parser.parse_args()
     if not options.apikey:
