@@ -23,7 +23,7 @@ Usage
 
 * plug in the RFID reader assembly, determine which usbserial device it is.
 * use stty to configure the serial port for raw reads:
-    `stty -F /dev/ttyUSB0 raw`
+    `stty -F /dev/ttyUSB0 raw speed 9600`
 * direct the reader's output to the toggl.py script:
     `cat /dev/ttyUSB0 | python toggl.py -m tags.yaml -k <your api key>`
     OR

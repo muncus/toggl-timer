@@ -26,6 +26,34 @@ class MethodRequest(urllib2.Request):
 
 
 #TODO: remove the need for a yaml map of rfid->task
+#TODO: turn the yaml map into a json map, so i dont need both formats.
+
+
+# dictionary of tag number -> string
+TAG_MAP = {}
+TASKS = []
+
+def updateTask(taskid, duration):
+    """ add duration to the duration of the task with the supplied id.
+    """
+    TASKS = getTasks() # refresh our task list.
+    task = None
+    taskid = taskid
+    for t in TASKS:
+        if t['id'] == taskid:
+            task = t
+            break
+    task['duration'] += int(duration)
+
+    # now send up the new task.
+    posturl = "http://www.toggl.com/api/v3/tasks/%d.json" % task['id']
+    r = MethodRequest(posturl, data="{\"task\": %s }" % json.dumps(task), method="PUT")
+    r = addAuthHeader(r, options.apikey)
+    r.add_header("Content-type", "application/json")
+    print r.get_data()
+    print r.get_full_url()
+    f = urllib2.urlopen(r)
+    print f.read()
 
 def createTask(taskobj):
     """ creates a new task in Toggl with the specified contents."""
@@ -45,6 +73,14 @@ def addAuthHeader(request, apikey):
     base64string = base64.encodestring('%s:%s' % (apikey, 'api_token')).replace('\n', '')
     request.add_header("Authorization", "Basic %s" % base64string)   
     return request
+
+def getTasks():
+    r = urllib2.Request("http://www.toggl.com/api/v3/tasks.json")
+    r = addAuthHeader(r, options.apikey)
+
+    f = urllib2.urlopen(r)
+    TASKS = (json.load(f))['data']
+    return TASKS
 
 def getTaskJsonObject(cpn, duration):
     """Creates a Toggl task api object, using a JsonObject."""
@@ -67,7 +103,7 @@ if __name__ == "__main__":
                       help="yaml file containing tag id -> task mapping")
     parser.add_option("-i", "--input", dest='input', default=None,
                       help="read input from the specified file/device")
-    parser.add_option("-m", "--min_time", dest='min_time', default=0,
+    parser.add_option("-m", "--min_time", dest='min_time', default=10,
                       help="events shorter than this will not be reported")
     (options, args) = parser.parse_args()
     if not options.apikey:
@@ -88,7 +124,7 @@ if __name__ == "__main__":
         if not s or s[0] == '#':
             continue
         (key, duration) = s.split() 
-        print "key: %s" % key
+        #print "key: %s" % key
         if(TAG_MAP.has_key(key)):
             print TAG_MAP[key]
             if(duration < options.min_time):
