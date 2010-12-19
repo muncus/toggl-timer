@@ -120,19 +120,36 @@ def getTask(cpn, duration):
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-k", "--toggl_key", dest='apikey', help="Toggl api key")
-    parser.add_option("-m", "--tagmap", dest='mapfile',
+    parser.add_option("-t", "--tagmap", dest='mapfile',
                       help="yaml file containing tag id -> task mapping")
+    parser.add_option("-i", "--input", dest='input', default=None,
+                      help="read input from the specified file/device")
+    parser.add_option("-m", "--min_time", dest='min_time', default=0,
+                      help="events shorter than this will not be reported")
     (options, args) = parser.parse_args()
+    if not options.apikey:
+      parser.error("--toggl_key is a required argument")
+    if not options.mapfile:
+      parser.error("--tagmap is a required argument")
+
     TAG_MAP = yaml.load(file(options.mapfile))
 
+    if options.input:
+      # input specified, read it.
+      inputfh = open(options.input)
+    else:
+      inputfh = stdin
+
     while True:
-        s = stdin.readline()
+        s = inputfh.readline()
         if not s or s[0] == '#':
             continue
         (key, duration) = s.split() 
         #print "key: %s" % key
         if(TAG_MAP.has_key(key)):
-            #updateTask(TAG_MAP[key], duration)
-            createTask(getTaskJsonObject(TAG_MAP[key], duration))
+            print TAG_MAP[key]
+            if(duration < options.min_time):
+              print "%s : event too short" % key
+            createTask(getTaskJsonObject(TAG_MAP[key], int(duration)))
         else:
             print "unknown tag: %s" % key
