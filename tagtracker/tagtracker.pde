@@ -1,13 +1,10 @@
 /*
- * Tag Tracker
- * print out the tag number of an rfid, and how long it has been present on the reader.
- * The ID of the tag is recorded when a new tag is read. as long as that tag
- * continues to be present, output nothing. when the card is removed, print the
- * ID, and the number of seconds it has been there, followed by a newline.
+ * Tag Tracker - Punch Clock
+ * Clock-in/Clock-out style rfid punchclock. when a tag is clocked out, the tag number is printed, with the number of seconds the tag was clocked in.
  */
 #include <NewSoftSerial.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define RFID_TAG_LENGTH 10  //bytes needed to read the tag id.
 #define RFID_TAG_INPUT  16  //bytes of input required to read a whole tag.
@@ -68,9 +65,13 @@ void loop(){
     else {
       Serial.println("# tags didnt match. :(");
     }
+  
+  }  
+  //reset the reader if we just read a tag.
+  if(tagPresent){
+    resetRfid();
   }
 
-  resetRfid();
   delay(200);
 
 }
@@ -183,7 +184,7 @@ int ctoi(char c){
 }
 
 boolean tagsEqual(char* t1, char* t2){
-  return (strncmp(t1, t2, 10));
+  return (strncmp(t1, t2, RFID_TAG_LENGTH));
 }
 
 
