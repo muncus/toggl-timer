@@ -127,8 +127,9 @@ if __name__ == "__main__":
         #print "key: %s" % key
         if(TAG_MAP.has_key(key)):
             print TAG_MAP[key]
-            if(duration < options.min_time):
+            if(int(duration) < options.min_time):
               print "%s : event too short" % key
+              continue
             createTask(getTaskJsonObject(TAG_MAP[key], int(duration)))
         else:
             print "unknown tag: %s" % key
