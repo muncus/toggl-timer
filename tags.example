@@ -1,0 +1,3 @@
+# map rfid tag numbers to toggl tasks.
+"0" : "Some Project Name"
+"1" : "Client name - project name"
