@@ -2,7 +2,7 @@
  * Tag Tracker - Punch Clock
  * Clock-in/Clock-out style rfid punchclock. when a tag is clocked out, the tag number is printed, with the number of seconds the tag was clocked in.
  */
-#include <NewSoftSerial.h>
+#include <SoftwareSerial.h>
 
 #define DEBUG 0
 
@@ -14,7 +14,11 @@
 #define PIN_RFID_RX 9
 #define PIN_CLOCK_RUNNING 13 //indicates that we are clocked in
 
-NewSoftSerial rfid = NewSoftSerial(PIN_RFID_RX, PIN_RFID_TX);
+// TV
+#define PIN_BUTTON_TV 3
+#define PIN_BUTTON_VG 4
+
+SoftwareSerial rfid = SoftwareSerial(PIN_RFID_RX, PIN_RFID_TX);
 char temptag[RFID_TAG_LENGTH];
 char currentTag[RFID_TAG_LENGTH+1]; // the tag we are currently tracking.
 unsigned long tagStartTime = 0;      // time at which we first saw currentTag
