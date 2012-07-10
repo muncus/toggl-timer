@@ -58,7 +58,8 @@ def updateTask(taskid, duration):
 def createTask(taskobj):
     """ creates a new task in Toggl with the specified contents."""
     # now send up the new task.
-    posturl = "http://www.toggl.com/api/v3/tasks.json"
+    #posturl = "http://www.toggl.com/api/v3/tasks.json"
+    posturl = "https://www.toggl.com/api/v6/time_entries.json"
     r = MethodRequest(posturl, data=json.dumps(taskobj), method="POST")
     r = addAuthHeader(r, options.apikey)
     r.add_header("Content-type", "application/json")
@@ -90,11 +91,13 @@ def getTaskJsonObject(cpn, duration):
         'duration': duration,
         'billable': True,
         'start': starttime.isoformat(),
-        'end': endtime.isoformat(),
-        'project' : {'client_project_name': cpn},
+        'stop': endtime.isoformat(),
+        'project' : {"id": 526871},
         'created_with': USERAGENT,
+        'ignore_start_and_stop': True,
+        'description': '',
     }
-    return {'task': baseobj}
+    return {'time_entry': baseobj}
 
 if __name__ == "__main__":
     parser = OptionParser()
@@ -108,10 +111,11 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
     if not options.apikey:
       parser.error("--toggl_key is a required argument")
-    if not options.mapfile:
-      parser.error("--tagmap is a required argument")
+    #if not options.mapfile:
+    #  parser.error("--tagmap is a required argument")
 
-    TAG_MAP = yaml.load(file(options.mapfile))
+    #if options.mapfile:
+    #  TAG_MAP = yaml.load(file(options.mapfile))
 
     if options.input:
       # input specified, read it.
@@ -121,9 +125,11 @@ if __name__ == "__main__":
 
     while True:
         s = inputfh.readline()
+        s = s.strip()
         if not s or s[0] == '#':
             continue
-        (key, duration) = s.split() 
+        print "(%s)" % s
+        (duration, key) = s.split(" ", 1) 
         #print "key: %s" % key
         if(TAG_MAP.has_key(key)):
             print TAG_MAP[key]
@@ -132,4 +138,7 @@ if __name__ == "__main__":
               continue
             createTask(getTaskJsonObject(TAG_MAP[key], int(duration)))
         else:
-            print "unknown tag: %s" % key
+            print "SDLKFSDLFKJSDF"
+            print duration
+            createTask(getTaskJsonObject(key, int(duration)))
+            #print "unknown tag: %s" % key
